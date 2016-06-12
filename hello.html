@@ -1,7 +1,44 @@
-<html>
-  <head>
-  </head>
-  <body>
-    <h1>Hello, World!</h1>
-  </body>
-</html>
+import datetime
+import csv
+from glob import glob
+# Constants
+COLUMN_NAMES = (
+    'DATUM / TIJD',
+    'TRACKINGSNUMMER',
+    'AANTAL PAKKETTEN',
+    'GETEKEND DOOR',
+    'POST BEDRIJF')
+QUESTIONS = (
+    '\nScan the TRACKINGNUMBER:',
+    '\nAMOUNT of packets?',
+    '\nWHO scans?',
+    '\nWhich POST?')
+answers = list()
+# Print each question and save user input in a list
+for question in QUESTIONS:
+    print(question)
+    answers.append(input())
+def csv_save(data_to_write):
+    with open('post.csv', 'a', newline='') as csv_out:
+        wtr = csv.writer(csv_out, dialect='excel')
+        wtr.writerow(data_to_write)
+# Check if file named 'post.csv' exists
+file_exists = glob('post.csv')
+# Add current time to answers list at 1st position (index 0)
+time_format = '%a %d %b %Y %H:%M'  # format 'Sat 09 Jan 2016 11:05'
+time_now = datetime.datetime.now()
+answers.insert(0, time_now.strftime(time_format))
+# Open .csv file(or create new one if it doesn't exists + write COLUNMS)
+# and write answers, comma separated
+if not file_exists:
+    print('\nFile does not exists.')
+    csv_save(COLUMN_NAMES)
+    csv_save(answers)
+    print('\nNew file is created.')
+    print('\nAll data is saved.')
+else:
+    try:
+        csv_save(answers)
+        print('\nAll data is saved.')
+    except PermissionError:
+        print("Can't save, file is in use.")
